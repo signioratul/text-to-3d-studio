@@ -1,36 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prompt-to-3D Studio
 
-## Getting Started
+AI-powered text-to-3D web application that converts natural-language prompts into 3D models.
 
-First, run the development server:
+## Overview
+
+Prompt-to-3D Studio uses a two-step generation pipeline:
+
+```text
+Text prompt
+    ↓
+Text-to-image generation
+    ↓
+Image-to-3D generation
+    ↓
+GLB model
+    ↓
+Interactive 3D viewer
+```
+
+The application is built with Next.js and React Three Fiber, with GLB as the output format.
+
+## Tech Stack
+
+* Next.js
+* TypeScript
+* React
+* Tailwind CSS
+* React Three Fiber
+* Three.js
+* `@react-three/drei`
+* Hugging Face Spaces
+* GLB / glTF
+
+## Current Features
+
+* Text-to-image generation
+* Image-to-3D generation
+* GLB model output
+* Interactive 3D viewer
+* Orbit rotation
+* Zoom
+* Pan
+* Reset view
+* Auto-rotate
+* Model loading fallback
+* Model loading error boundary
+
+## Architecture
+
+The application follows a client-orchestrated, stateless two-step pipeline.
+
+The provider layer is kept behind an adapter-oriented structure so generation providers can be changed without redesigning the application.
+
+## Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application is then available through the local development server.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Status
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The initial 3D viewer foundation is implemented and verified.
 
-## Learn More
+Current milestone:
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* P0.3 — Pipeline verification: complete
+* P1.1 — 3D libraries: complete
+* P1.2 — Bare 3D viewer: complete
+* P1.3 — Orbit controls: complete
+* P1.4 — Reset, auto-rotate, and error boundary: complete
