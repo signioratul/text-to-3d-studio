@@ -2,9 +2,7 @@
 
 > Turn a text description into a viewable and downloadable 3D model in the browser using a two-stage AI pipeline: text → image → 3D.
 
-**Live Demo:** `TODO: add live Vercel URL`
-
-**Screenshot:** `TODO: add production screenshot`
+**Live Demo:** Live Demo: https://text-to-3d-studio-seven.vercel.app
 
 ---
 
