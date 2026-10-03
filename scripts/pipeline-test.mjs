@@ -1,35 +1,71 @@
-import { Client, handle_file } from "@gradio/client";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { performance } from "node:perf_hooks";
+import { hfImageProvider, hfMeshProvider } from "../lib/providers/hf.ts";
 
 const PROMPT = "a small wooden treasure chest";
+
 const SCRATCH_DIR = path.resolve("scratch");
 const IMAGE_PATH = path.join(SCRATCH_DIR, "out.webp");
 const GLB_PATH = path.join(SCRATCH_DIR, "out.glb");
 
-async function saveGradioFile(fileData, outputPath) {
-  if (!fileData) {
-    throw new Error("Gradio returned no file.");
+async function saveImage(imageUrl, outputPath) {
+  if (
+    !imageUrl.startsWith("http://") &&
+    !imageUrl.startsWith("https://")
+  ) {
+    throw new Error(`Invalid image URL returned by provider: ${imageUrl}`);
   }
 
-  const file = fileData.value ?? fileData;
-  const sourceUrl = file.url ?? file.path;
-
-  if (!sourceUrl) {
-    throw new Error(`Gradio returned no file URL/path: ${JSON.stringify(fileData)}`);
-  }
-
-  const response = await fetch(sourceUrl);
+  const response = await fetch(imageUrl);
 
   if (!response.ok) {
     throw new Error(
-      `Failed to download generated file: HTTP ${response.status}`
+      `Failed to download generated image: HTTP ${response.status}`
     );
   }
 
   const buffer = Buffer.from(await response.arrayBuffer());
+
+  if (buffer.length === 0) {
+    throw new Error("Generated image is empty.");
+  }
+
   await fs.writeFile(outputPath, buffer);
+}
+
+async function saveStream(stream, outputPath) {
+  const reader = stream.getReader();
+  const chunks = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      if (!(value instanceof Uint8Array)) {
+        throw new Error("Provider returned a non-Uint8Array stream chunk.");
+      }
+
+      chunks.push(value);
+      totalBytes += value.byteLength;
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  if (totalBytes === 0) {
+    throw new Error("Generated GLB stream is empty.");
+  }
+
+  const buffer = Buffer.concat(chunks, totalBytes);
+
+  await fs.writeFile(outputPath, buffer);
+
+  return buffer;
 }
 
 async function verifyFile(filePath, expectedMagic) {
@@ -44,6 +80,7 @@ async function verifyFile(filePath, expectedMagic) {
 
   try {
     const buffer = Buffer.alloc(4);
+
     await handle.read(buffer, 0, 4, 0);
 
     const magic = buffer.toString("ascii");
@@ -62,75 +99,64 @@ async function verifyFile(filePath, expectedMagic) {
 async function main() {
   await fs.mkdir(SCRATCH_DIR, { recursive: true });
 
-  const token = process.env.HF_TOKEN;
+  console.log("P2.3 REAL PROVIDER TEST");
+  console.log("========================");
+  console.log(`Provider: ${process.env.PROVIDER ?? "not set"}`);
+  console.log(`Prompt: ${PROMPT}`);
 
-  if (!token) {
-    console.warn("WARNING: HF_TOKEN is not set.");
+  if (!process.env.HF_TOKEN) {
+    throw new Error("HF_TOKEN is not set.");
   }
 
-  const options = token ? { token } : {};
+  if (!process.env.IMAGE_TIMEOUT_MS) {
+    throw new Error("IMAGE_TIMEOUT_MS is not set.");
+  }
 
-  console.log("Connecting to FLUX.1-schnell...");
-  const flux = await Client.connect(
-    "black-forest-labs/FLUX.1-schnell",
-    options
-  );
+  if (!process.env.MESH_TIMEOUT_MS) {
+    throw new Error("MESH_TIMEOUT_MS is not set.");
+  }
 
-  console.log("Connecting to Hunyuan3D-2...");
-  const hunyuan = await Client.connect(
-    "tencent/Hunyuan3D-2",
-    options
-  );
-
-  console.log("\nSTEP 1: Text → Image");
+  console.log("\nSTEP 1: Text -> Image");
 
   const imageStart = performance.now();
 
-  const imageResult = await flux.predict("/infer", {
-    prompt: PROMPT,
-  });
+  const imageResult = await hfImageProvider.textToImage(PROMPT);
 
   const imageEnd = performance.now();
 
-  const generatedImage = imageResult.data?.[0];
-
-  await saveGradioFile(generatedImage, IMAGE_PATH);
-
+  console.log(`Provider: ${hfImageProvider.name}`);
+  console.log(`Image URL: ${imageResult.imageUrl}`);
   console.log(
-    `Image step: ${((imageEnd - imageStart) / 1000).toFixed(2)}s`
+    `Image generation: ${((imageEnd - imageStart) / 1000).toFixed(2)}s`
   );
+
+  await saveImage(imageResult.imageUrl, IMAGE_PATH);
+
   console.log(`Saved: ${IMAGE_PATH}`);
 
-  console.log("\nSTEP 2: Image → 3D");
+  console.log("\nSTEP 2: Image -> GLB");
 
-  const image3dStart = performance.now();
+  const meshStart = performance.now();
 
-  const image3dResult = await hunyuan.predict("/shape_generation", {
-    caption: null,
-    image: handle_file(IMAGE_PATH),
-    mv_image_front: null,
-    mv_image_back: null,
-    mv_image_left: null,
-    mv_image_right: null,
-    steps: 30,
-    guidance_scale: 5,
-    seed: 1234,
-    octree_resolution: 256,
-    check_box_rembg: true,
-    num_chunks: 8000,
-    randomize_seed: true,
-  });
-
-  const image3dEnd = performance.now();
-
-  const generatedGlb = image3dResult.data?.[0];
-
-  await saveGradioFile(generatedGlb, GLB_PATH);
-
-  console.log(
-    `3D step: ${((image3dEnd - image3dStart) / 1000).toFixed(2)}s`
+  const meshResult = await hfMeshProvider.imageToGlb(
+    imageResult.imageUrl
   );
+
+  const meshEnd = performance.now();
+
+  console.log(`Provider: ${hfMeshProvider.name}`);
+  console.log(`Reported size: ${meshResult.size ?? "unknown"} bytes`);
+  console.log(
+    `Mesh generation: ${((meshEnd - meshStart) / 1000).toFixed(2)}s`
+  );
+
+  const glbBuffer = await saveStream(
+    meshResult.stream,
+    GLB_PATH
+  );
+
   console.log(`Saved: ${GLB_PATH}`);
+  console.log(`Actual GLB size: ${glbBuffer.byteLength} bytes`);
 
   console.log("\nVERIFICATION");
 
@@ -140,15 +166,23 @@ async function main() {
   console.log("\nRESULT");
 
   if (imagePass && glbPass) {
-    console.log("PASS: Pipeline completed successfully.");
+    console.log("PASS: P2.3 real provider pipeline completed successfully.");
+    console.log("PASS: Image provider returned a downloadable image.");
+    console.log("PASS: Mesh provider returned a valid GLB.");
   } else {
-    console.log("FAIL: Pipeline verification failed.");
+    console.log("FAIL: P2.3 verification failed.");
     process.exitCode = 1;
   }
 }
 
 main().catch((error) => {
-  console.error("\nPIPELINE FAILED");
-  console.error(error);
+  console.error("\nP2.3 PIPELINE FAILED");
+
+  if (error instanceof Error) {
+    console.error(`${error.name}: ${error.message}`);
+  } else {
+    console.error(error);
+  }
+
   process.exitCode = 1;
 });
