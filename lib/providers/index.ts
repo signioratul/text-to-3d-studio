@@ -10,32 +10,50 @@ import {
 import type { ImageProvider, MeshProvider } from "./types";
 
 const providerName = process.env.PROVIDER ?? "mock";
+const imageProviderName = process.env.IMAGE_PROVIDER ?? providerName;
+const meshProviderName = process.env.MESH_PROVIDER ?? providerName;
 
-function selectProviders(): {
-  imageProvider: ImageProvider;
-  meshProvider: MeshProvider;
-} {
-  switch (providerName) {
-    case "mock":
-      console.log("[MOCK] Provider selected");
-      return {
-        imageProvider: mockImageProvider,
-        meshProvider: mockMeshProvider,
-      };
+const imageProviders: Record<string, ImageProvider> = {
+  mock: mockImageProvider,
+  hf: hfImageProvider,
+};
 
-    case "hf":
-      console.log("[HF] Provider selected");
-      return {
-        imageProvider: hfImageProvider,
-        meshProvider: hfMeshProvider,
-      };
+const meshProviders: Record<string, MeshProvider> = {
+  mock: mockMeshProvider,
+  hf: hfMeshProvider,
+};
 
-    default:
-      throw new AppError(
-        "INTERNAL",
-        `Unsupported PROVIDER "${providerName}". Expected "hf" or "mock".`
-      );
+function selectProvider<T>(
+  providerName: string,
+  variableName: string,
+  providers: Record<string, T>
+): T {
+  const provider = providers[providerName];
+
+  if (!provider) {
+    throw new AppError(
+      "INTERNAL",
+      `Unsupported ${variableName} "${providerName}". Expected "hf" or "mock".`
+    );
   }
+
+  return provider;
 }
 
-export const { imageProvider, meshProvider } = selectProviders();
+export const imageProvider = selectProvider(
+  imageProviderName,
+  "IMAGE_PROVIDER",
+  imageProviders
+);
+export const meshProvider = selectProvider(
+  meshProviderName,
+  "MESH_PROVIDER",
+  meshProviders
+);
+
+if (imageProviderName === meshProviderName) {
+  console.log(`[${imageProviderName.toUpperCase()}] Provider selected`);
+} else {
+  console.log(`[${imageProviderName.toUpperCase()}] Image provider selected`);
+  console.log(`[${meshProviderName.toUpperCase()}] Mesh provider selected`);
+}
