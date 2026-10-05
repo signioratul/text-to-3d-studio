@@ -191,7 +191,7 @@ async function outputGlb(
   stream: ReadableStream<Uint8Array>;
   size: number;
 }> {
-  const url = fileUrl(result.data?.[1]);
+   const url = fileUrl(result.data?.[0]);
 
   if (!url) {
     throw new AppError(
@@ -290,7 +290,7 @@ export const hfMeshProvider: MeshProvider = {
     try {
       const result = await predict(
         HUNYUAN,
-	"/generation_all",
+        "/shape_generation",
         {
           caption: null,
           image: handle_file(imageUrl),
