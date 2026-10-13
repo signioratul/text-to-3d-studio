@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  --background: #0b0d16;
+  --foreground: #e7e9f2;
+
+  --surface: rgba(20, 24, 39, 0.68);
+  --surface-hover: rgba(29, 34, 52, 0.78);
+  --border: rgba(190, 198, 225, 0.13);
+
+  --accent: #aaa4d5;
+  --accent-soft: #c2b9e8;
+  --text-muted: #9ba4bc;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 
 @theme inline {
@@ -12,15 +25,62 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  min-height: 100%;
+  background: var(--background);
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  margin: 0;
+  background: transparent;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  color: #f5f2ff;
+  background: rgba(153, 137, 207, 0.38);
+}
+
+.interactive-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.glass-panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.glass-panel-hover {
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.glass-panel-hover:hover {
+  border-color: rgba(190, 180, 230, 0.23);
+  background: var(--surface-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
