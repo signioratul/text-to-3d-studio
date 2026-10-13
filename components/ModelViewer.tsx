@@ -50,7 +50,7 @@ export default function ModelViewer({
   resetKey = 0,
 }: ModelViewerProps) {
   return (
-    <section className="group relative h-[420px] w-full min-w-0 overflow-hidden rounded-2xl border border-white/[0.12] bg-[#101321]/80 shadow-[0_24px_80px_rgba(0,0,0,0.22)] sm:h-[500px] lg:h-full lg:min-h-0">
+    <section className="group relative h-[320px] w-full min-w-0 overflow-hidden rounded-2xl border border-white/[0.12] bg-[#101321]/80 shadow-[0_24px_80px_rgba(0,0,0,0.22)] sm:h-[380px] lg:h-[600px] [@media(orientation:landscape)_and_(max-height:800px)]:h-[360px]">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,rgba(129,123,180,0.13),transparent_48%),linear-gradient(180deg,rgba(36,42,65,0.20),transparent_60%,rgba(9,12,23,0.40)]"

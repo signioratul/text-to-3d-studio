@@ -37,7 +37,7 @@ class ModelErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex h-[420px] w-full items-center justify-center rounded-b-2xl border border-t-0 border-white/10 bg-slate-950/40 sm:h-[500px] lg:h-[600px]">
+        <div className="flex h-[180px] items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-slate-950/40 p-3 sm:h-[220px] [@media(orientation:landscape)_and_(max-height:800px)]:h-[160px]">
           <p className="text-sm text-slate-400">
             Could not load model
           </p>
