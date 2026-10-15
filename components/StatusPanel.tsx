@@ -18,7 +18,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   RATE_LIMITED:
     "Too many requests were made. Please wait a moment and try again.",
   QUOTA_EXCEEDED:
-    "Unfortunately since this is a free service, the quota for the day is exceeded. You can try after 6:30 pm today",
+    "Unfortunately since this is a free service, the quota for the day is exceeded. You can try later.",
   PROVIDER_BUSY:
     "The AI service is busy right now. Please try again shortly.",
   PROVIDER_DOWN:
