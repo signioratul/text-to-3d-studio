@@ -2,42 +2,108 @@
 
 :root {
   color-scheme: dark;
+  --bg: #080a10;
+  --fg: #f2f4f5;
+  --dim: #8993a5;
+  --card: rgba(14, 16, 18, 0.72);
+  --line: rgba(255, 255, 255, 0.1);
 
-  --background: #0b0d16;
-  --foreground: #e7e9f2;
-
-  --surface: rgba(20, 24, 39, 0.68);
-  --surface-hover: rgba(29, 34, 52, 0.78);
-  --border: rgba(190, 198, 225, 0.13);
-
+  --surface: rgba(12, 17, 27, 0.66);
+  --surface-hover: rgba(20, 27, 41, 0.82);
+  --border: rgba(205, 216, 238, 0.14);
   --accent: #aaa4d5;
   --accent-soft: #c2b9e8;
   --text-muted: #9ba4bc;
+  --panel-background: var(--card);
+  --panel-border: var(--line);
+  --shadow: 0 18px 55px rgba(0, 0, 0, 0.28);
+  --field-background: rgba(3, 7, 14, 0.48);
+  --workspace-background: rgba(5, 9, 17, 0.46);
+  --grid-line: rgba(174, 180, 214, 0.12);
+}
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --fg: #171717;
+  --dim: #a3a3a3;
+  --card: rgba(255, 255, 255, 0.72);
+  --line: rgba(0, 0, 0, 0.08);
+
+  --surface: rgba(255, 255, 255, 0.66);
+  --surface-hover: rgba(255, 255, 255, 0.84);
+  --border: rgba(25, 39, 58, 0.13);
+  --accent: #6963a5;
+  --accent-soft: #8b83c4;
+  --text-muted: #697586;
+  --panel-background: var(--card);
+  --panel-border: var(--line);
+  --shadow: 0 18px 55px rgba(40, 52, 76, 0.10);
+  --field-background: rgba(255, 255, 255, 0.58);
+  --workspace-background: rgba(255, 255, 255, 0.42);
+  --grid-line: rgba(70, 82, 112, 0.10);
+}
+
+/* Before the client background mounts, respect the operating-system theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #080a10;
+    --fg: #f2f4f5;
+    --dim: #8993a5;
+    --card: rgba(14, 16, 18, 0.72);
+    --line: rgba(255, 255, 255, 0.1);
+    --surface: rgba(12, 17, 27, 0.66);
+    --surface-hover: rgba(20, 27, 41, 0.82);
+    --border: rgba(205, 216, 238, 0.14);
+    --accent: #aaa4d5;
+    --accent-soft: #c2b9e8;
+    --text-muted: #9ba4bc;
+    --panel-background: var(--card);
+    --panel-border: var(--line);
+    --shadow: 0 18px 55px rgba(0, 0, 0, 0.28);
+    --field-background: rgba(3, 7, 14, 0.48);
+    --workspace-background: rgba(5, 9, 17, 0.46);
+    --grid-line: rgba(174, 180, 214, 0.12);
+  }
+}
+
+:root {
+  --background: var(--bg);
+  --foreground: var(--fg);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+html,
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-geist-sans), "Geist", system-ui, sans-serif;
+}
+
 html {
   min-height: 100%;
-  background: var(--background);
+  background-color: var(--bg);
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  background: transparent;
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background-color 220ms ease, color 220ms ease;
+}
+
+main {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
@@ -45,19 +111,37 @@ body {
   background: rgba(153, 137, 207, 0.38);
 }
 
-.interactive-background {
+/* Shark animation canvas from shark-background.zip. */
+.shark-background-root {
   position: fixed;
   inset: 0;
   z-index: 0;
-  width: 100%;
-  height: 100%;
+  overflow: hidden;
   pointer-events: none;
 }
 
+.shark-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  font-family: var(--font-geist-mono), ui-monospace, Menlo, monospace;
+  opacity: 0.78;
+}
+
+:root[data-theme="light"] .shark-bg {
+  filter: invert(1) hue-rotate(180deg);
+  opacity: 0.56;
+}
+
+/* Shared translucent surfaces. */
 .glass-panel {
-  border: 1px solid var(--border);
-  background: var(--surface);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-background);
+  box-shadow: var(--shadow);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
 }
@@ -66,12 +150,35 @@ body {
   transition:
     border-color 220ms ease,
     background-color 220ms ease,
-    box-shadow 220ms ease;
+    box-shadow 220ms ease,
+    transform 220ms ease;
 }
 
 .glass-panel-hover:hover {
-  border-color: rgba(190, 180, 230, 0.23);
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--panel-border));
   background: var(--surface-hover);
+}
+
+.form3d-muted {
+  color: var(--text-muted);
+}
+
+.form3d-field {
+  border: 1px solid var(--border);
+  background: var(--field-background);
+  color: var(--fg);
+}
+
+.form3d-workspace {
+  border: 1px solid var(--border);
+  background: var(--workspace-background);
+}
+
+.form3d-grid {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 42px 42px;
 }
 
 @media (prefers-reduced-motion: reduce) {

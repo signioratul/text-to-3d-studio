@@ -1,8 +1,9 @@
+
 # Text-to-3D Studio
 
 > Turn a text description into a viewable and downloadable 3D model in the browser using a two-stage AI pipeline: text → image → 3D.
 
-**Live Demo:** Live Demo: https://text-to-3d-studio-seven.vercel.app
+**Live Demo:** https://text-to-3d-studio-seven.vercel.app
 
 ---
 
@@ -28,34 +29,36 @@ Interactive browser viewer
 
 Generated models are returned as GLB files, displayed using React Three Fiber, and can be downloaded directly from the browser.
 
+The interface uses a dark visual theme with translucent glass panels and an animated ASCII ocean background.
+
 ---
 
 ## Features
 
-* Text prompt input with server-side validation.
-* 200-character prompt limit with live character counter.
-* Example prompt chips.
-* Step-by-step generation status.
-* Elapsed generation timer.
-* Retry support for failed generation steps.
-* Interactive GLB viewer.
-* Orbit controls for:
-
-  * Rotate
-  * Zoom
-  * Pan
-* Model auto-centering and auto-scaling.
-* Reset-view control.
-* Auto-rotate control.
-* Generated reference-image preview.
-* Download generated models as `.glb`.
-* Prompt-based GLB filenames.
-* Pre-generated sample models when live AI generation is unavailable.
-* Responsive dark UI.
-* Server-side Hugging Face authentication.
-* Provider adapter architecture allowing the AI provider implementation to be replaced.
-* Best-effort per-IP rate limiting.
-* GLB validation using the `glTF` binary magic header.
+- Text prompt input with server-side validation.
+- 200-character prompt limit with live character counter.
+- Example prompt chips.
+- Step-by-step generation status.
+- Elapsed generation timer.
+- Retry support for failed generation steps.
+- Interactive GLB viewer.
+- Orbit controls for:
+  - Rotate
+  - Zoom
+  - Pan
+- Model auto-centering and auto-scaling.
+- Reset-view control.
+- Auto-rotate control.
+- Generated reference-image preview.
+- Download generated models as `.glb`.
+- Prompt-based GLB filenames.
+- Pre-generated sample models when live AI generation is unavailable.
+- Responsive dark UI with a near-black color palette and translucent glass panels.
+- Animated ASCII ocean/shark background.
+- Server-side Hugging Face authentication.
+- Provider adapter architecture allowing the AI provider implementation to be replaced.
+- Best-effort per-IP rate limiting.
+- GLB validation using the `glTF` binary magic header.
 
 ---
 
@@ -63,35 +66,35 @@ Generated models are returned as GLB files, displayed using React Three Fiber, a
 
 ### Frontend
 
-* Next.js 16.3.6
-* React 19.2.8
-* TypeScript
-* Tailwind CSS
-* React Three Fiber
-* `@react-three/drei`
-* Three.js
+- Next.js 16.3.6
+- React 19.2.8
+- TypeScript
+- Tailwind CSS
+- React Three Fiber
+- `@react-three/drei`
+- Three.js
 
 ### Backend
 
-* Next.js App Router route handlers
-* Node.js runtime
-* Hugging Face Spaces
-* `@gradio/client`
+- Next.js App Router route handlers
+- Node.js runtime
+- Hugging Face Spaces
+- `@gradio/client`
 
 ### AI
 
-* `black-forest-labs/FLUX.1-schnell`
-* `tencent/Hunyuan3D-2`
+- `black-forest-labs/FLUX.1-schnell`
+- `tencent/Hunyuan3D-2`
 
 ### Testing
 
-* Vitest
-* Mock provider for local automated tests
+- Vitest
+- Mock provider for local automated tests
 
 ### Deployment
 
-* Vercel
-* GitHub
+- Vercel
+- GitHub
 
 ---
 
@@ -105,13 +108,11 @@ flowchart TD
     B --> C[Provider Adapter]
     C --> D[Hugging Face FLUX Space]
     D --> E[Generated Reference Image]
-
     E -->|imageUrl| F[Browser]
     F -->|POST /api/mesh| G[Next.js Mesh Route]
     G --> H[Provider Adapter]
     H --> I[Hugging Face Hunyuan3D-2 Space]
     I --> J[Generated GLB]
-
     J --> G
     G --> F
     F --> K[React Three Fiber Viewer]
@@ -229,15 +230,16 @@ A practical observed end-to-end figure is therefore approximately **20–25 seco
 
 ### Requirements
 
-* Node.js
-* npm
-* Git
-* A Hugging Face account/token for the real provider
+- Node.js
+- npm
+- Git
+- A Hugging Face account/token for the real provider
 
 ### 1. Clone the repository
 
 ```bash
 git clone https://github.com/signioratul/text-to-3d-studio.git
+
 cd text-to-3d-studio
 ```
 
@@ -261,10 +263,15 @@ For real provider usage:
 
 ```env
 PROVIDER=hf
+
 HF_TOKEN=your_hugging_face_token
+
 IMAGE_TIMEOUT_MS=120000
+
 MESH_TIMEOUT_MS=240000
+
 RATE_LIMIT_MAX=3
+
 RATE_LIMIT_WINDOW_MIN=1
 ```
 
@@ -292,14 +299,14 @@ http://localhost:3000
 
 ## Environment Variables
 
-| Variable                | Required          | Description                                           | Example  |
-| ----------------------- | ----------------- | ----------------------------------------------------- | -------- |
-| `PROVIDER`              | Yes               | Selects the provider implementation                   | `hf`     |
-| `HF_TOKEN`              | Required for `hf` | Server-only Hugging Face authentication token         | `hf_...` |
-| `IMAGE_TIMEOUT_MS`      | Yes               | Image-generation request timeout in milliseconds      | `120000` |
-| `MESH_TIMEOUT_MS`       | Yes               | Image-to-3D request timeout in milliseconds           | `240000` |
-| `RATE_LIMIT_MAX`        | Yes               | Maximum requests allowed within the configured window | `3`      |
-| `RATE_LIMIT_WINDOW_MIN` | Yes               | Rate-limit window in minutes                          | `1`      |
+| Variable | Required | Description | Example |
+|---|---|---|---|
+| `PROVIDER` | Yes | Selects the provider implementation | `hf` |
+| `HF_TOKEN` | Required for `hf` | Server-only Hugging Face authentication token | `hf_...` |
+| `IMAGE_TIMEOUT_MS` | Yes | Image-generation request timeout in milliseconds | `120000` |
+| `MESH_TIMEOUT_MS` | Yes | Image-to-3D request timeout in milliseconds | `240000` |
+| `RATE_LIMIT_MAX` | Yes | Maximum requests allowed within the configured window | `3` |
+| `RATE_LIMIT_WINDOW_MIN` | Yes | Rate-limit window in minutes | `1` |
 
 `HF_TOKEN` must remain server-side. It must never be exposed through a `NEXT_PUBLIC_*` variable.
 
@@ -333,7 +340,9 @@ The project was verified locally with:
 
 ```text
 Tests: 6 passed
+
 Production build: passed
+
 TypeScript: passed
 ```
 
@@ -361,10 +370,15 @@ Add the required variables under the **Production** environment:
 
 ```text
 PROVIDER
+
 HF_TOKEN
+
 IMAGE_TIMEOUT_MS
+
 MESH_TIMEOUT_MS
+
 RATE_LIMIT_MAX
+
 RATE_LIMIT_WINDOW_MIN
 ```
 
@@ -378,6 +392,7 @@ The application uses Next.js route handlers for:
 
 ```text
 /api/image
+
 /api/mesh
 ```
 
@@ -387,12 +402,12 @@ The mesh route is configured for a long-running serverless invocation because 3D
 
 After deployment, verify:
 
-* The homepage loads.
-* The prompt form works.
-* `/api/image` reaches the Hugging Face provider.
-* `/api/mesh` returns GLB data when the provider is available.
-* The GLB loads in the viewer.
-* The GLB can be downloaded.
+- The homepage loads.
+- The prompt form works.
+- `/api/image` reaches the Hugging Face provider.
+- `/api/mesh` returns GLB data when the provider is available.
+- The GLB loads in the viewer.
+- The GLB can be downloaded.
 
 ---
 
@@ -410,6 +425,7 @@ The deployed application has been verified to reach the Hugging Face provider, b
 
 ```text
 429
+
 The AI service has reached its available quota. Please try again later.
 ```
 
@@ -439,6 +455,7 @@ Observed successful end-to-end generation took:
 
 ```text
 19.41s
+
 24.24s
 ```
 
@@ -468,14 +485,14 @@ This allows the 3D viewer and download experience to remain demonstrable even wh
 
 ## Security
 
-* Hugging Face credentials are stored server-side.
-* `.env*` files are excluded from Git except `.env.example`.
-* No client-side `NEXT_PUBLIC_*` token is used.
-* Prompt validation occurs server-side.
-* `/api/mesh` validates the allowed image URL hosts.
-* Generation responses use `Cache-Control: no-store`.
-* Provider errors are mapped to application-level error codes.
-* Tokens are not returned in API responses or intentionally logged.
+- Hugging Face credentials are stored server-side.
+- `.env*` files are excluded from Git except `.env.example`.
+- No client-side `NEXT_PUBLIC_*` token is used.
+- Prompt validation occurs server-side.
+- `/api/mesh` validates the allowed image URL hosts.
+- Generation responses use `Cache-Control: no-store`.
+- Provider errors are mapped to application-level error codes.
+- Tokens are not returned in API responses or intentionally logged.
 
 ---
 
@@ -493,11 +510,11 @@ Add persistent storage for generated models and metadata so users can revisit pr
 
 Expose generation controls such as:
 
-* Texture generation
-* Mesh quality
-* Polygon/detail level
-* Generation steps
-* Seed control
+- Texture generation
+- Mesh quality
+- Polygon/detail level
+- Generation steps
+- Seed control
 
 ### Better provider resilience
 
@@ -511,12 +528,12 @@ Persist recent prompts and preview images in a user-accessible gallery while kee
 
 Add structured production metrics for:
 
-* Image-generation latency
-* Mesh-generation latency
-* Provider failures
-* Quota failures
-* Successful GLB generation
-* Download completion
+- Image-generation latency
+- Mesh-generation latency
+- Provider failures
+- Quota failures
+- Successful GLB generation
+- Download completion
 
 ---
 
@@ -524,6 +541,7 @@ Add structured production metrics for:
 
 ```text
 text-to-3d/
+
 ├── app/
 │   ├── api/
 │   │   ├── image/
@@ -538,7 +556,15 @@ text-to-3d/
 │   ├── ModelViewer.tsx
 │   ├── PromptForm.tsx
 │   ├── SampleGallery.tsx
-│   └── StatusPanel.tsx
+│   ├── StatusPanel.tsx
+│   └── ascii-sharks/
+│       ├── engine.ts
+│       ├── index.ts
+│       ├── math.ts
+│       ├── react.tsx
+│       ├── renderer.ts
+│       ├── species.ts
+│       └── world.ts
 │
 ├── hooks/
 │   └── useGeneration.ts
@@ -587,11 +613,25 @@ They are therefore not presented as working providers in this project.
 
 ---
 
+## Background Animation Attribution
+
+The animated ASCII ocean/shark background is based on **[ascii-sharks](https://github.com/stackedlol/ascii-sharks)** by **stackedlol**.
+
+- **Upstream repository:** https://github.com/stackedlol/ascii-sharks
+- **License:** MIT. Refer to the upstream repository for the license text and terms.
+- **Integration:** The `AsciiOcean` React component and supporting TypeScript source are included in `components/ascii-sharks/` and rendered as a decorative, fixed background behind the Form3D interface.
+
+The background animation is a third-party component. Form3D's text-to-image and image-to-3D pipeline is separate from this library.
+
+---
+
 ## License
 
 This project's application code is provided for demonstration and portfolio purposes.
 
 The underlying AI models and services retain their respective licenses and usage conditions. Refer to the provider and model documentation before using generated outputs commercially.
+
+The `ascii-sharks` background component is a third-party project and retains its own MIT license. See the upstream repository for its license terms.
 
 ---
 
@@ -599,15 +639,16 @@ The underlying AI models and services retain their respective licenses and usage
 
 The application has:
 
-* A completed Next.js frontend.
-* An interactive GLB viewer.
-* A two-stage AI provider architecture.
-* Verified Hugging Face provider integration.
-* Automated tests using the mock provider.
-* A successful production build.
-* A deployed Vercel application.
-* Server-side provider credentials.
-* GLB download support.
-* Sample-model fallback.
+- A completed Next.js frontend.
+- An interactive GLB viewer.
+- A two-stage AI provider architecture.
+- Verified Hugging Face provider integration.
+- Automated tests using the mock provider.
+- A successful production build.
+- A deployed Vercel application.
+- Server-side provider credentials.
+- GLB download support.
+- Sample-model fallback.
+- Dark-themed interface with animated ASCII ocean background.
 
 Live AI generation availability currently depends on Hugging Face provider quota and shared ZeroGPU availability.

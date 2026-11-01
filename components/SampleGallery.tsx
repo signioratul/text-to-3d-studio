@@ -19,23 +19,19 @@ type SampleGalleryProps = {
 export default function SampleGallery({
   visible,
 }: SampleGalleryProps) {
-  if (!visible) {
-    return null;
-  }
+  if (!visible) return null;
 
   return (
     <section
-      className="w-full rounded-xl border border-zinc-800 bg-zinc-900 p-4"
+      className="glass-panel w-full rounded-2xl p-4 sm:p-5"
       aria-label="Sample models"
     >
       <div className="mb-4">
-        <h2 className="text-sm font-semibold text-zinc-100">
+        <h2 className="text-sm font-semibold" style={{ color: "var(--fg)" }}>
           Sample model (live generation unavailable)
         </h2>
-
-        <p className="mt-1 text-xs text-zinc-500">
-          This is a pre-existing model and was not
-          generated from your prompt.
+        <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+          This is a pre-existing model and was not generated from your prompt.
         </p>
       </div>
 
@@ -43,15 +39,22 @@ export default function SampleGallery({
         {SAMPLES.map((sample) => (
           <div
             key={sample.url}
-            className="rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+            className="rounded-xl border p-3"
+            style={{
+              borderColor: "var(--border)",
+              background: "var(--surface)",
+            }}
           >
-            <p className="mb-3 text-sm text-zinc-300">
+            <p className="mb-3 text-sm" style={{ color: "var(--fg)" }}>
               {sample.name}
             </p>
-
             <a
               href={sample.url}
-              className="inline-flex rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-200 hover:bg-zinc-800"
+              className="inline-flex rounded-lg border px-3 py-2 text-xs transition hover:-translate-y-0.5"
+              style={{
+                borderColor: "var(--border)",
+                color: "var(--fg)",
+              }}
             >
               Open model
             </a>

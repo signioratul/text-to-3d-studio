@@ -13,7 +13,6 @@ function slugify(value: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-
   return slug || "model";
 }
 
@@ -24,12 +23,8 @@ export default function DownloadButton({
   const disabled = !modelUrl;
 
   function handleDownload() {
-    if (!modelUrl) {
-      return;
-    }
-
+    if (!modelUrl) return;
     const anchor = document.createElement("a");
-
     anchor.href = modelUrl;
     anchor.download = `${slugify(prompt)}.glb`;
     anchor.click();
@@ -40,7 +35,7 @@ export default function DownloadButton({
       type="button"
       onClick={handleDownload}
       disabled={disabled}
-      className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
+      className="rounded-xl bg-gradient-to-r from-[#929fce] via-[#aaa0d0] to-[#c1a6c5] px-4 py-3 text-sm font-semibold text-[#171827] shadow-[0_5px_24px_rgba(142,132,190,0.14)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:bg-none disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none dark:disabled:bg-slate-800 dark:disabled:text-slate-500"
     >
       Download GLB
     </button>

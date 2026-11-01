@@ -34,7 +34,6 @@ const ERROR_MESSAGES: Record<string, string> = {
 function formatElapsed(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
@@ -42,13 +41,10 @@ function getStepLabel(state: GenerationState): string | null {
   switch (state) {
     case "imaging":
       return "Creating reference image";
-
     case "meshing":
       return "Building 3D mesh";
-
     case "loading":
       return "Preparing your model";
-
     default:
       return null;
   }
@@ -81,30 +77,28 @@ export default function StatusPanel({
 
     return (
       <section
-        className="w-full rounded-2xl border border-rose-300/15 bg-rose-950/20 p-4 shadow-[0_12px_36px_rgba(0,0,0,0.10)] backdrop-blur-xl sm:p-5"
+        className="w-full rounded-2xl border border-rose-400/25 bg-rose-500/[0.07] p-4 shadow-[0_12px_36px_rgba(0,0,0,0.08)] backdrop-blur-xl sm:p-5"
         aria-live="polite"
       >
         <div className="flex items-start gap-3">
           <span
             aria-hidden="true"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-rose-200/10 bg-rose-200/[0.06] text-rose-200"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-rose-400/25 bg-rose-500/10 text-rose-500"
           >
             !
           </span>
-
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-rose-100">
+            <p className="text-sm font-medium text-rose-600 dark:text-rose-200">
               Generation could not be completed
             </p>
-            <p className="mt-1 text-sm leading-6 text-rose-100/70">
+            <p className="mt-1 text-sm leading-6 text-rose-700/80 dark:text-rose-100/70">
               {message}
             </p>
-
             {error.retryable && (
               <button
                 type="button"
                 onClick={() => void retry()}
-                className="mt-4 rounded-xl border border-rose-200/15 bg-rose-100/[0.06] px-4 py-2 text-sm font-medium text-rose-50 transition hover:bg-rose-100/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-200/50"
+                className="mt-4 rounded-xl border border-rose-400/30 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-500/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400/50 dark:text-rose-100"
               >
                 Try again
               </button>
@@ -124,29 +118,39 @@ export default function StatusPanel({
 
     return (
       <section
-        className="w-full rounded-2xl border border-white/[0.10] bg-slate-950/40 p-4 shadow-[0_12px_36px_rgba(0,0,0,0.10)] backdrop-blur-xl sm:p-5"
+        className="glass-panel w-full rounded-2xl p-4 sm:p-5"
         aria-live="polite"
       >
         <div className="flex items-start gap-3">
           <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-violet-200/15 bg-violet-200/[0.06] text-sm font-medium text-violet-200"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
+            style={{
+              borderColor: "var(--border)",
+              background: "var(--surface)",
+            }}
             aria-hidden="true"
           >
-            <span className="h-2 w-2 animate-pulse rounded-full bg-violet-200/80" />
+            <span className="h-2 w-2 animate-pulse rounded-full bg-violet-500" />
           </div>
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-sm font-medium text-slate-100">
+              <p className="text-sm font-medium" style={{ color: "var(--fg)" }}>
                 {stepLabel}
               </p>
-
-              <span className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-xs tabular-nums text-slate-400">
+              <span
+                className="rounded-full border px-2.5 py-1 text-xs tabular-nums"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "var(--surface)",
+                  color: "var(--dim)",
+                }}
+              >
                 {formatElapsed(elapsedSeconds)}
               </span>
             </div>
 
-            <p className="mt-1 text-xs leading-5 text-slate-400">
+            <p className="mt-1 text-xs leading-5" style={{ color: "var(--dim)" }}>
               {`Step ${stepNumber} of 3`} · Free AI services may take up to about 2 minutes.
             </p>
 
@@ -160,7 +164,7 @@ export default function StatusPanel({
                   className={`h-1 rounded-full transition-colors duration-500 ${
                     step <= stepNumber
                       ? "bg-gradient-to-r from-[#999acb] to-[#c1b3d8]"
-                      : "bg-white/[0.08]"
+                      : "bg-slate-400/20"
                   }`}
                 />
               ))}

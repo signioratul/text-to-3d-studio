@@ -1,13 +1,8 @@
+
 "use client";
 
-import {
-  Component,
-  type ReactNode,
-  useState,
-} from "react";
-
+import { Component, type ReactNode, useState } from "react";
 import DownloadButton from "@/components/DownloadButton";
-import InteractiveBackground from "@/components/InteractiveBackground";
 import ModelViewer from "@/components/ModelViewer";
 import PromptForm from "@/components/PromptForm";
 import SampleGallery from "@/components/SampleGallery";
@@ -37,8 +32,14 @@ class ModelErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex h-[180px] items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-slate-950/40 p-3 sm:h-[220px] [@media(orientation:landscape)_and_(max-height:800px)]:h-[160px]">
-          <p className="text-sm text-slate-400">
+        <div
+          className="flex h-[180px] items-center justify-center overflow-hidden rounded-xl border p-3 sm:h-[220px] [@media(orientation:landscape)_and_(max-height:800px)]:h-[160px]"
+          style={{
+            borderColor: "var(--border)",
+            background: "var(--workspace-background)",
+          }}
+        >
+          <p className="text-sm" style={{ color: "var(--dim)" }}>
             Could not load model
           </p>
         </div>
@@ -77,16 +78,10 @@ export default function Home() {
 
   const showSamples =
     state === "error" &&
-    (
-      error?.code === "QUOTA_EXCEEDED" ||
-      (
-        retryAttempted &&
-        (
-          error?.code === "PROVIDER_DOWN" ||
-          error?.code === "PROVIDER_BUSY"
-        )
-      )
-    );
+    (error?.code === "QUOTA_EXCEEDED" ||
+      (retryAttempted &&
+        (error?.code === "PROVIDER_DOWN" ||
+          error?.code === "PROVIDER_BUSY")));
 
   const hasModel = state === "done" && Boolean(modelUrl);
 
@@ -97,104 +92,131 @@ export default function Home() {
       : "Awaiting prompt";
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-[#0b0d16] text-slate-100">
-      <InteractiveBackground />
+    <main className="min-h-screen overflow-x-hidden px-4 py-5 sm:px-6 sm:py-8 lg:px-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-7">
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-4 py-5 sm:px-6 sm:py-8 lg:px-10">
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-violet-200/15 bg-violet-200/[0.06] text-xl text-violet-200">
-              ◈
-            </div>
-
-            <div>
-              <p className="text-base font-semibold tracking-tight text-slate-100">
-                Form3D
-              </p>
-              <p className="mt-0.5 text-xs text-slate-400">
-                AI creation studio
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.035] px-3 py-2 text-xs text-slate-300 backdrop-blur-xl">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#a9c8b9]" />
-            Text to 3D
-          </div>
-        </header>
-
+        {/* Hero section */}
         <section className="max-w-3xl space-y-3">
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-violet-200/80">
+          <p
+            className="text-xs font-medium uppercase tracking-[0.22em]"
+            style={{ color: "var(--accent)" }}
+          >
             Your imagination, in three dimensions
           </p>
 
-          <h1 className="text-3xl font-medium tracking-tight text-slate-100 sm:text-4xl lg:text-5xl">
-            <span className="text-[#b8b4dc]">
+          <h1
+            className="text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl"
+            style={{ color: "var(--fg)" }}
+          >
+            From words to{" "}
+            <span className="bg-gradient-to-r from-[#8589bd] via-[#a99dcc] to-[#b78eb0] bg-clip-text text-transparent">
               3D reality.
             </span>
           </h1>
 
-          <p className="max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
-            Describe an object, generate a reference image, and
-            transform it into a model you can explore and download.
+          <p
+            className="max-w-2xl text-sm leading-6 sm:text-base"
+            style={{ color: "var(--dim)" }}
+          >
+            Describe an object, generate a reference image, and transform it
+            into a model you can explore and download.
           </p>
         </section>
 
-        <div className="grid min-w-0 grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(290px,0.78fr)_minmax(0,1.5fr)] lg:gap-8">
+        {/* Main workspace */}
+        <div className="grid min-w-0 grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(290px,0.78fr)_minmax(0,1.5fr)] lg:gap-7">
+
+          {/* Prompt panel */}
           <aside className="glass-panel min-w-0 rounded-2xl p-4 sm:p-6 lg:mt-[68px]">
             <div className="mb-6">
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+              <p
+                className="text-xs font-medium uppercase tracking-[0.16em]"
+                style={{ color: "var(--dim)" }}
+              >
                 Create
               </p>
 
-              <h2 className="mt-2 text-xl font-medium text-slate-100">
+              <h2
+                className="mt-2 text-xl font-medium"
+                style={{ color: "var(--fg)" }}
+              >
                 Describe your model
               </h2>
 
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+              <p
+                className="mt-2 text-sm leading-6"
+                style={{ color: "var(--dim)" }}
+              >
                 Add the shape, material, and details you want to see.
               </p>
             </div>
 
-            <PromptForm
-              onSubmit={handleGenerate}
-              disabled={isGenerating}
-            />
+            <PromptForm onSubmit={handleGenerate} disabled={isGenerating} />
 
-            <div className="mt-6 border-t border-white/[0.08] pt-4">
-              <p className="text-xs leading-5 text-slate-500">
-                Tip: specific details about materials, proportions,
-                and style can help define your object.
+            <div
+              className="mt-6 border-t pt-4"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
+                Tip: specific details about materials, proportions, and style
+                can help define your object.
               </p>
             </div>
           </aside>
 
+          {/* 3D workspace */}
           <section className="min-w-0 space-y-0">
-            {/* Workspace toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-t-2xl border border-white/[0.10] bg-slate-900/45 px-4 py-3 backdrop-blur-xl sm:px-5">
+            <div
+              className="flex flex-wrap items-center justify-between gap-3 rounded-t-2xl border px-4 py-3 backdrop-blur-xl sm:px-5"
+              style={{
+                borderColor: "var(--border)",
+                background: "var(--surface)",
+              }}
+            >
               <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-violet-200/10 bg-violet-200/[0.05] text-violet-200">
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border"
+                  style={{
+                    borderColor: "var(--border)",
+                    background: "var(--surface)",
+                    color: "var(--accent)",
+                  }}
+                >
                   ◈
                 </div>
 
                 <div className="min-w-0">
-                  <h2 className="text-sm font-medium text-slate-200">
+                  <h2
+                    className="text-sm font-medium"
+                    style={{ color: "var(--fg)" }}
+                  >
                     3D Preview
                   </h2>
-                  <p className="mt-0.5 text-xs text-slate-500">
+
+                  <p
+                    className="mt-0.5 text-xs"
+                    style={{ color: "var(--dim)" }}
+                  >
                     Inspect and interact with your model
                   </p>
                 </div>
               </div>
 
-              <span className="flex shrink-0 items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.025] px-3 py-1.5 text-xs text-slate-400">
+              <span
+                className="flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "var(--surface)",
+                  color: "var(--dim)",
+                }}
+              >
                 <span
                   className={`h-1.5 w-1.5 rounded-full ${
                     hasModel
-                      ? "bg-emerald-300/80"
+                      ? "bg-emerald-500"
                       : isGenerating
-                        ? "animate-pulse bg-violet-300/80"
-                        : "bg-slate-500"
+                        ? "animate-pulse bg-violet-500"
+                        : "bg-slate-400"
                   }`}
                 />
                 {workspaceStatus}
@@ -216,16 +238,29 @@ export default function Home() {
               <div className="glass-panel mt-4 overflow-hidden rounded-2xl p-4 sm:p-5">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-sm font-medium text-slate-200">
+                    <h3
+                      className="text-sm font-medium"
+                      style={{ color: "var(--fg)" }}
+                    >
                       Reference image
                     </h3>
-                    <p className="mt-1 text-xs text-slate-400">
+
+                    <p
+                      className="mt-1 text-xs"
+                      style={{ color: "var(--dim)" }}
+                    >
                       Generated from your description
                     </p>
                   </div>
                 </div>
 
-                <div className="flex h-[220px] items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-slate-950/40 p-3 sm:h-[280px]">
+                <div
+                  className="flex h-[220px] items-center justify-center overflow-hidden rounded-xl border p-3 sm:h-[280px]"
+                  style={{
+                    borderColor: "var(--border)",
+                    background: "var(--workspace-background)",
+                  }}
+                >
                   <img
                     src={imageUrl}
                     alt="Generated reference"
@@ -247,31 +282,61 @@ export default function Home() {
                 </ModelErrorBoundary>
               </div>
             ) : (
-              <div className="relative flex h-[420px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/[0.10] bg-slate-950/30 px-6 text-center backdrop-blur-sm sm:h-[500px] lg:h-[600px]">
+              <div
+                className="relative flex h-[420px] flex-col items-center justify-center overflow-hidden rounded-2xl border px-6 text-center backdrop-blur-sm sm:h-[500px] lg:h-[600px]"
+                style={{
+                  borderColor: "var(--border)",
+                  background: "var(--workspace-background)",
+                }}
+              >
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(174,180,214,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(174,180,214,0.12)_1px,transparent_1px)] [background-size:42px_42px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]"
+                  className="form3d-grid pointer-events-none absolute inset-0 opacity-80 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]"
                 />
 
-                <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-violet-200/15 bg-violet-200/[0.05] text-3xl text-violet-200/80">
+                <div
+                  className="relative flex h-16 w-16 items-center justify-center rounded-2xl border text-3xl"
+                  style={{
+                    borderColor: "var(--border)",
+                    background: "var(--surface)",
+                    color: "var(--accent)",
+                  }}
+                >
                   ◈
                 </div>
 
-                <h3 className="relative mt-5 text-lg font-medium text-slate-200">
+                <h3
+                  className="relative mt-5 text-lg font-medium"
+                  style={{ color: "var(--fg)" }}
+                >
                   Your next creation starts here
                 </h3>
 
-                <p className="relative mt-2 max-w-sm text-sm leading-6 text-slate-400">
-                  Enter a description to generate a reference image
-                  and build your 3D model.
+                <p
+                  className="relative mt-2 max-w-sm text-sm leading-6"
+                  style={{ color: "var(--dim)" }}
+                >
+                  Enter a description to generate a reference image and build
+                  your 3D model.
                 </p>
 
-                <div className="relative mt-6 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
-                  <span className="rounded-full border border-white/[0.08] px-3 py-1.5">
+                <div
+                  className="relative mt-6 flex flex-wrap items-center justify-center gap-2 text-xs"
+                  style={{ color: "var(--dim)" }}
+                >
+                  <span
+                    className="rounded-full border px-3 py-1.5"
+                    style={{ borderColor: "var(--border)" }}
+                  >
                     Image generation
                   </span>
+
                   <span aria-hidden="true">→</span>
-                  <span className="rounded-full border border-white/[0.08] px-3 py-1.5">
+
+                  <span
+                    className="rounded-full border px-3 py-1.5"
+                    style={{ borderColor: "var(--border)" }}
+                  >
                     3D mesh
                   </span>
                 </div>
@@ -281,30 +346,30 @@ export default function Home() {
             {/* Viewer actions */}
             <div className="glass-panel mt-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl p-4">
               <div className="flex flex-wrap items-center gap-3">
-                <DownloadButton
-                  modelUrl={modelUrl}
-                  prompt={prompt}
-                />
+                <DownloadButton modelUrl={modelUrl} prompt={prompt} />
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setResetKey((value) => value + 1)
-                  }
+                  onClick={() => setResetKey((value) => value + 1)}
                   disabled={!hasModel}
-                  className="rounded-xl border border-white/[0.10] bg-white/[0.035] px-3.5 py-2 text-sm text-slate-300 transition hover:bg-white/[0.07] hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-xl border px-3.5 py-3 text-sm transition hover:bg-slate-500/10 disabled:cursor-not-allowed disabled:opacity-40"
+                  style={{
+                    borderColor: "var(--border)",
+                    color: "var(--fg)",
+                  }}
                 >
                   Reset view
                 </button>
               </div>
 
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-300">
+              <label
+                className="flex cursor-pointer items-center gap-2 text-sm"
+                style={{ color: "var(--fg)" }}
+              >
                 <input
                   type="checkbox"
                   checked={autoRotate}
-                  onChange={(event) =>
-                    setAutoRotate(event.target.checked)
-                  }
+                  onChange={(event) => setAutoRotate(event.target.checked)}
                   disabled={!hasModel}
                   className="accent-[#aaa4d5] disabled:cursor-not-allowed"
                 />
@@ -316,7 +381,10 @@ export default function Home() {
 
         <SampleGallery visible={showSamples} />
 
-       <footer className="border-t border-white/[0.07] pt-4 text-center text-xs text-slate-500">
+        <footer
+          className="border-t pt-4 text-center text-xs"
+          style={{ borderColor: "var(--border)", color: "var(--dim)" }}
+        >
           Form3D · AI-powered 3D creation
         </footer>
       </div>
