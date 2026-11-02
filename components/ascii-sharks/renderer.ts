@@ -30,6 +30,7 @@ const ACCENTS = ["#e0892c", "#e03a32", "#b44ae0", "#33c8cc", "#3cb54a", "#3150e8
 const SKIN_RAMP = ":;t%SX8#@";
 const FIN_GLYPHS = "%;tS:";
 const RIDGE_GLYPHS = "@8%";
+const SHARK_GLYPH_ALPHA = 0.45;
 const EDGE_HEAVY = ":;";
 const EDGE_LIGHT = ".',`";
 
@@ -39,10 +40,6 @@ const FLAG_EDGE = 2;
 const FLAG_FIN = 3;
 const FLAG_RIDGE = 4;
 const FLAG_EYE = 5;
-/** Dark skin markings: tiger bars, zebra-shark spots. */
-const FLAG_MARK = 6;
-const MARK_GLYPHS = "#%@";
-
 // Sub-cell sample offsets for anti-aliased silhouettes.
 const SUBSAMPLES = [0.25, 0.3, 0.75, 0.3, 0.25, 0.72, 0.75, 0.72];
 
@@ -64,16 +61,16 @@ interface SharkShape {
   falcate: boolean;
   /** Pelvic fins: leading root, trailing root, tip, reach. */
   pelvic: [number, number, number, number];
-  /** Forked caudal fin reach, or 0 when the tail is a ribbon (zebra shark). */
+  /** Forked caudal fin reach, or 0 when there is no distinct caudal fork. */
   caudal: number;
   dorsal: [number, number];
   secondDorsal: [number, number];
   /**
-   * Hammerheads' cephalofoil: half-span, how far its tips sweep back, its depth, and the
+   * Great hammerhead cephalofoil: half-span, how far its tips sweep back, its depth, and the
    * notch in the middle of the front edge. All fractions of length; absent for other sharks.
    */
   head?: { span: number; sweep: number; depth: number; notch: number };
-  /** null when the eyes sit somewhere else (hammerhead: on the cephalofoil tips). */
+  /** null when the eyes sit on the cephalofoil tips. */
   eye: [number, number] | null;
   gills: [number, number];
   /** Skin colour multipliers (r, g, b). */
@@ -92,64 +89,6 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     eye: [0.1, 0.14],
     gills: [0.19, 0.29],
     tint: [0.92, 0.97, 1.05],
-  },
-  // Slim neck under a wide, swept-back cephalofoil (drawn in sampleShark),
-  // tall first dorsal, long upper tail lobe. Bronze-olive grey.
-  hammerhead: {
-    halfWidth: (s) => {
-      if (s < 0.06) return 0.045;
-      if (s < 0.3) return 0.045 + 0.061 * smoothstep(0.06, 0.3, s);
-      return classicHalfWidth(s) * 0.92;
-    },
-    head: { span: 0.17, sweep: 0.035, depth: 0.09, notch: 0 },
-    pectoral: [0.17, 0.4, 0.5, 0.22],
-    falcate: true,
-    pelvic: [0.56, 0.63, 0.67, 0.075],
-    caudal: 0.11,
-    dorsal: [0.28, 0.44],
-    secondDorsal: [0.7, 0.74],
-    eye: null,
-    gills: [0.16, 0.26],
-    tint: [0.96, 0.98, 0.9],
-  },
-  // Blunt, square snout on a heavy body; barred back. Warm grey-brown.
-  tiger: {
-    halfWidth: (s) => {
-      if (s < 0.13) return 0.1 * Math.pow(Math.sin(((s / 0.13) * Math.PI) / 2), 0.45);
-      if (s < 0.3) return 0.1 + 0.014 * smoothstep(0.13, 0.3, s);
-      if (s < 0.84) return 0.019 + 0.095 * Math.pow(1 - (s - 0.3) / 0.54, 1.2);
-      const k = (s - 0.84) / 0.16;
-      return 0.019 * (1 - k) + 0.012 * Math.sin(k * Math.PI);
-    },
-    pectoral: [0.15, 0.42, 0.53, 0.25],
-    falcate: true,
-    pelvic: [0.57, 0.65, 0.69, 0.085],
-    caudal: 0.095,
-    dorsal: [0.33, 0.46],
-    secondDorsal: [0.71, 0.75],
-    eye: [0.08, 0.12],
-    gills: [0.19, 0.28],
-    tint: [1.02, 0.95, 0.84],
-  },
-  // Short rounded head, body done by half-length, then a long ribbon of a
-  // tail fin. Broad rounded pectorals, spotted sandy skin.
-  zebra: {
-    halfWidth: (s) => {
-      if (s < 0.1) return 0.075 * Math.pow(Math.sin(((s / 0.1) * Math.PI) / 2), 0.7);
-      if (s < 0.28) return 0.075 + 0.025 * smoothstep(0.1, 0.28, s);
-      if (s < 0.55) return 0.022 + 0.078 * Math.pow(1 - (s - 0.28) / 0.27, 1.1);
-      const k = (s - 0.55) / 0.45;
-      return 0.022 * (1 - k * k) + 0.012 * Math.sin(k * Math.PI);
-    },
-    pectoral: [0.12, 0.3, 0.36, 0.19],
-    falcate: false,
-    pelvic: [0.42, 0.48, 0.51, 0.065],
-    caudal: 0,
-    dorsal: [0.36, 0.44],
-    secondDorsal: [0.49, 0.53],
-    eye: [0.06, 0.09],
-    gills: [0.13, 0.2],
-    tint: [1.08, 0.97, 0.74],
   },
   // Great hammerhead: a broader, nearly straight-edged cephalofoil with a notch at the centre,
   // a towering sickle first dorsal (drawn long and bright from above), and a cooler slate skin.
@@ -190,50 +129,9 @@ const SHAPES: Record<SharkKind, SharkShape> = {
     gills: [0.2, 0.3],
     tint: [0.78, 0.9, 1.2],
   },
-  // Thresher: a compact body over the front half, then the upper tail lobe as a long whip
-  // that's as long as the shark itself. Big eyes, long sickle pectorals, bronze-violet skin.
-  thresher: {
-    halfWidth: (s) => {
-      if (s < 0.08) return 0.07 * Math.pow(Math.sin(((s / 0.08) * Math.PI) / 2), 0.75);
-      if (s < 0.2) return 0.07 + 0.02 * smoothstep(0.08, 0.2, s);
-      if (s < 0.48) return 0.012 + 0.078 * Math.pow(1 - (s - 0.2) / 0.28, 1.3);
-      // The whip: thin, with a slight sickle swell before it tapers out.
-      const k = (s - 0.48) / 0.52;
-      return 0.012 * (1 - k) + 0.006 * Math.sin(k * Math.PI * 0.9) + 0.002;
-    },
-    pectoral: [0.12, 0.27, 0.36, 0.2],
-    falcate: true,
-    pelvic: [0.37, 0.41, 0.44, 0.045],
-    caudal: 0,
-    dorsal: [0.24, 0.32],
-    secondDorsal: [0.45, 0.47],
-    eye: [0.05, 0.1],
-    gills: [0.11, 0.18],
-    tint: [1.0, 0.9, 1.08],
-  },
-  // Nurse shark: a blunt, broad head, a heavy flattened body with both dorsals set far back,
-  // rounded paddle pectorals, and a long low tail with no lower lobe. Tawny brown.
-  nurse: {
-    halfWidth: (s) => {
-      if (s < 0.08) return 0.085 * Math.pow(Math.sin(((s / 0.08) * Math.PI) / 2), 0.4);
-      if (s < 0.3) return 0.085 + 0.02 * smoothstep(0.08, 0.3, s);
-      if (s < 0.72) return 0.022 + 0.083 * Math.pow(1 - (s - 0.3) / 0.42, 1.1);
-      const k = (s - 0.72) / 0.28;
-      return 0.022 * (1 - k * k) + 0.014 * Math.sin(k * Math.PI);
-    },
-    pectoral: [0.16, 0.34, 0.4, 0.17],
-    falcate: false,
-    pelvic: [0.45, 0.52, 0.55, 0.075],
-    caudal: 0,
-    dorsal: [0.5, 0.58],
-    secondDorsal: [0.63, 0.69],
-    eye: [0.05, 0.075],
-    gills: [0.14, 0.22],
-    tint: [1.1, 0.96, 0.76],
-  },
 };
 
-const KINDS = Object.keys(SHAPES) as SharkKind[];
+const KINDS: SharkKind[] = ["classic", "greathammer", "mako"];
 
 function inTriangle(
   px: number, py: number,
@@ -300,7 +198,6 @@ export class AsciiRenderer {
   private arc = new Float32Array(SHARK_NODES);
   private arcTotal = 1;
   private shape = SHAPES.classic;
-  private sharkId = 0;
   private finTipLeft = 0;
   private finTipRight = 0;
   // Scratch outputs of sampleShark(), to avoid allocating per sample.
@@ -581,11 +478,6 @@ export class AsciiRenderer {
       } else if (s < 0.05) {
         // Pale snout tip.
         shade = Math.max(shade, 0.7);
-      } else if (shape === SHAPES.zebra && s > 0.08 && s < 0.55 && (across < 0.1 || Math.abs(across - 0.6) < 0.08)) {
-        // Zebra sharks carry pale ridges down the back.
-        shade = Math.max(shade, 0.8);
-      } else if (this.marked(s, a * bestSign, L, across)) {
-        flag = FLAG_MARK;
       }
       this.hitFlag = flag;
       this.hitShade = shade;
@@ -599,7 +491,7 @@ export class AsciiRenderer {
       // Falcate (sickle) fins get a concave trailing edge.
       !(shape.falcate && inTriangle(u, a, L * p1, 0, L * (p1 + (p2 - p1) * 0.33), tip * 0.55, L * p2, tip))
     ) {
-      this.hitFlag = this.marked(s, a * bestSign, L, 0) ? FLAG_MARK : FLAG_FIN;
+      this.hitFlag = FLAG_FIN;
       this.hitShade = 0.38 + 0.22 * (1 - clamp(a / tip, 0, 1));
       return true;
     }
@@ -612,29 +504,6 @@ export class AsciiRenderer {
       this.hitFlag = FLAG_FIN;
       this.hitShade = 0.36;
       return true;
-    }
-    return false;
-  }
-
-  /** Whether a body point (s along, v across) falls on a dark marking. */
-  private marked(s: number, v: number, L: number, across: number) {
-    if (this.shape === SHAPES.tiger) {
-      // Wavy vertical bars over the back half, fading out toward the head.
-      if (s < 0.2 || s > 0.9 || across > 0.85) return false;
-      const wobble = 0.35 * Math.sin((v / L) * 25 + s * 5);
-      const bar = Math.sin(s * Math.PI * 2 * 9 + wobble);
-      return bar > 0.65 - 0.5 * smoothstep(0.2, 0.42, s) + 0.4 * smoothstep(0.8, 0.9, s);
-    }
-    if (this.shape === SHAPES.zebra) {
-      // Leopard spots on a jittered grid, so they ride along with the skin.
-      if (s < 0.07) return false;
-      const gu = (s * L) / (L * 0.06);
-      const gv = v / (L * 0.045);
-      const cu = Math.floor(gu);
-      const cv = Math.floor(gv);
-      const jx = hash3(cu, cv, this.sharkId) * 0.5 + 0.25;
-      const jy = hash3(cu, cv, this.sharkId + 11) * 0.5 + 0.25;
-      return (gu - cu - jx) ** 2 + (gv - cv - jy) ** 2 < 0.08;
     }
     return false;
   }
@@ -655,7 +524,6 @@ export class AsciiRenderer {
       const n = sh.nodes;
       const swim = clamp(sh.speed / 60, 0.4, 1.4);
       this.shape = SHAPES[sh.kind];
-      this.sharkId = sh.id;
       const kindIndex = KINDS.indexOf(sh.kind);
 
       // Travelling body wave, growing toward the tail.
@@ -777,7 +645,10 @@ export class AsciiRenderer {
           roll < 0.07
             ? ACCENTS[key % ACCENTS.length]
             : `rgb(${Math.round(g * tr)},${Math.round(g * tg)},${Math.min(255, Math.round(g * tb + 6))})`;
+        const previousAlpha = ctx.globalAlpha;
+        ctx.globalAlpha = previousAlpha * SHARK_GLYPH_ALPHA;
         ctx.fillText(set[(key >>> 8) % set.length], x + cw / 2, y + ch / 2 + 1);
+        ctx.globalAlpha = previousAlpha;
         continue;
       }
 
@@ -789,9 +660,6 @@ export class AsciiRenderer {
       } else if (flag === FLAG_EYE) {
         level = 12;
         glyph = "o";
-      } else if (flag === FLAG_MARK) {
-        level = 24 + shade * 22;
-        glyph = MARK_GLYPHS[(key >>> 8) % MARK_GLYPHS.length];
       } else if (flag === FLAG_FIN) {
         level = 40 + shade * 120;
         glyph = FIN_GLYPHS[(key >>> 8) % FIN_GLYPHS.length];
@@ -807,12 +675,14 @@ export class AsciiRenderer {
 
       let color: string;
       if (flag === FLAG_EYE) color = "#9aa0ad";
-      else if (flag === FLAG_MARK) color = `rgb(${Math.round(70 * tr)},${Math.round(70 * tg)},${Math.round(70 * tb)})`;
       else if (roll < 0.09) color = ACCENTS[key % ACCENTS.length];
       else if (roll < 0.13) color = "#ffffff";
       else color = shade > 0.55 ? "#0e0f13" : "#1b1d24";
       ctx.fillStyle = color;
+      const previousAlpha = ctx.globalAlpha;
+      ctx.globalAlpha = previousAlpha * SHARK_GLYPH_ALPHA;
       ctx.fillText(glyph, x + cw / 2, y + ch / 2 + 1);
+      ctx.globalAlpha = previousAlpha;
     }
   }
 

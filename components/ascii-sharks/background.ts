@@ -3,7 +3,7 @@ import { OceanEngine, type SharkKind, type SharkSpec } from "./index";
 export type { SharkKind, SharkSpec };
 
 export interface BackgroundOptions {
-  /** Sharks to show. Kinds: classic, hammerhead, greathammer, zebra, tiger, mako, thresher, nurse. */
+  /** Sharks to show. Kinds: classic, greathammer, mako. */
   sharks?: SharkSpec[];
   /** "dark" | "light" | "auto" (follows the system). Light mode inverts the canvas. */
   theme?: "dark" | "light" | "auto";
@@ -12,9 +12,9 @@ export interface BackgroundOptions {
 }
 
 const DEFAULT_SHARKS: SharkSpec[] = [
-  { kind: "hammerhead", size: 1 },
+  { kind: "greathammer", size: 1 },
   { kind: "classic", size: 0.9 },
-  { kind: "thresher", size: 0.8 },
+  { kind: "mako", size: 0.8 },
   { kind: "classic", size: 0.7 },
 ];
 
